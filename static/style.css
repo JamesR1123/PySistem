@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Condo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Edit Condo</h1>
+        <form action="/update_condo/{{ condo.id }}" method="POST">
+            <input type="text" name="name" value="{{ condo.name }}" required>
+            <input type="text" name="location" value="{{ condo.location }}" required>
+            <input type="number" name="price" value="{{ condo.price }}" required>
+            <button type="submit">Update Condo</button>
+            <a href="/" class="cancel">Cancel</a>
+        </form>
+    </div>
+</body>
+</html>
