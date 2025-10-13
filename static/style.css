@@ -1,21 +1,281 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Condo</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <div class="container">
-        <h1>Edit Condo</h1>
-        <form action="/update_condo/{{ condo.id }}" method="POST">
-            <input type="text" name="name" value="{{ condo.name }}" required>
-            <input type="text" name="location" value="{{ condo.location }}" required>
-            <input type="number" name="price" value="{{ condo.price }}" required>
-            <button type="submit">Update Condo</button>
-            <a href="/" class="cancel">Cancel</a>
-        </form>
-    </div>
-</body>
-</html>
+/* ====== GLOBAL ====== */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #f0f4f8;
+    margin: 0;
+    color: #333;
+}
+
+/* ====== LOGIN PAGE (YOUR REQUEST) ====== */
+.login-bg {
+    background: url('https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.login-container {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    text-align: center;
+    width: 350px;
+    backdrop-filter: blur(10px);
+}
+
+.login-container h1 {
+    color: #005bea;
+    margin-bottom: 20px;
+}
+
+.login-container .error {
+    color: #d10b0b;
+    background: #ffe4e4;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.login-container input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-sizing: border-box; /* Important for padding */
+}
+
+.login-container button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #005bea, #00c6fb);
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.login-container button:hover {
+    transform: scale(1.03);
+}
+
+/* ====== HEADER ====== */
+header {
+    background: linear-gradient(90deg, #005bea, #00c6fb);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+header h1 {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.logout {
+    background: rgba(255,255,255,0.15);
+    padding: 8px 18px;
+    border-radius: 8px;
+    color: white;
+    text-decoration: none;
+    transition: 0.3s;
+}
+.logout:hover {
+    background: white;
+    color: #005bea;
+}
+
+/* ====== MAIN CONTAINER ====== */
+.container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+/* ====== ADD CONDO FORM ====== */
+.add-condo-form {
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    margin-bottom: 40px;
+}
+
+.add-condo-form h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #005bea;
+}
+
+.add-condo-form form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: center;
+}
+
+.add-condo-form input[type="text"],
+.add-condo-form input[type="number"] {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    flex: 1 1 180px; /* Allow flexible growth */
+    outline: none;
+}
+
+/* Style for file upload */
+.add-condo-form input[type="file"] {
+    display: none; /* Hide the default input */
+}
+.file-upload-label {
+    padding: 12px 20px;
+    background: #e9ecef;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: 0.3s;
+}
+.file-upload-label:hover {
+    background: #dde2e6;
+}
+
+.add-condo-form button {
+    background: linear-gradient(90deg, #005bea, #00c6fb);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    flex-grow: 1; /* Allow button to grow */
+}
+.add-condo-form button:hover {
+    transform: scale(1.05);
+}
+
+/* ====== CONDO GRID ====== */
+.condo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+}
+
+.condo-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    overflow: hidden;
+    transition: 0.4s;
+    display: flex;
+    flex-direction: column;
+}
+.condo-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+}
+
+.condo-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.condo-info {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.condo-info h3 {
+    margin: 0;
+    color: #005bea;
+}
+.condo-info p {
+    margin: 5px 0;
+}
+
+.status {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-top: auto; /* Push to the bottom */
+    align-self: flex-start;
+}
+.status.available {
+    background: #e0ffe5;
+    color: #1e9d2b;
+}
+.status.booked {
+    background: #ffe4e4;
+    color: #d10b0b;
+}
+.actions {
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+}
+.actions a {
+    text-decoration: none;
+    margin-right: 15px;
+    color: #005bea;
+    font-weight: 500;
+    transition: 0.3s;
+}
+.actions a.book-now {
+    color: #1e9d2b;
+}
+.actions a:hover {
+    opacity: 0.7;
+}
+
+/* ====== EDIT PAGE ====== */
+.edit-container {
+    max-width: 500px;
+    margin: 50px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+}
+
+.edit-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.edit-container input, .edit-container select {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.edit-container button {
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #005bea, #00c6fb);
+    color: white;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.edit-container a {
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+    color: #555;
+}
