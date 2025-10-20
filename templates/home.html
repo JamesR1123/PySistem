@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CondoRent | Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="home-bg">
+    <header class="home-header">
+        <h1>🏠 CondoRent</h1>
+        <nav>
+            <a href="{{ url_for('login_page') }}" class="btn-login">Login</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h2>Find Your Perfect Condo</h2>
+        <p>Browse beautiful condominiums for rent — modern, affordable, and near you!</p>
+        <a href="#featured" class="btn-primary">View Condos</a>
+    </section>
+
+    <section id="featured" class="featured-condos">
+        <h2>Featured Condos</h2>
+        <div class="condo-grid">
+            {% for condo in condos %}
+            <div class="condo-card">
+                <img src="{{ url_for('static', filename=condo.image_url or 'default_condo.jpg') }}" alt="Condo Image" width="200">
+                <div class="condo-info">
+                    <h3>{{ condo.name }}</h3>
+                    <p>{{ condo.location }}</p>
+                    <p>₱{{ condo.price }} / month</p>
+                    <span class="status {{ 'available' if condo.status == 'Available' else 'booked' }}">
+                        {{ condo.status }}
+                    </span>
+                </div>
+            </div>
+            {% else %}
+            <p class="no-condos">No condos available yet.</p>
+            {% endfor %}
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2025 CondoRent. All rights reserved.</p>
+    </footer>
+</body>
+</html>

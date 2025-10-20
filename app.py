@@ -8,11 +8,15 @@ app.secret_key = "mysecretkey"
 UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static', 'uploads')
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 # --- DATABASE SETUP ---
 def init_db():
     conn = sqlite3.connect('condo_system.db')
     cursor = conn.cursor()
-    # Create Condos Table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS condos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -23,7 +27,6 @@ def init_db():
             image_url TEXT
         )
     ''')
-    # Create Bookings Table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS bookings (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -32,7 +35,6 @@ def init_db():
             FOREIGN KEY (condo_id) REFERENCES condos (id)
         )
     ''')
-    # Create Users Table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -40,22 +42,26 @@ def init_db():
             password TEXT NOT NULL
         )
     ''')
-
-    # Now, safely check if the admin user exists
     cursor.execute("SELECT * FROM users WHERE username='admin'")
     if not cursor.fetchone():
         cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", ('admin', 'admin123'))
         conn.commit()
     conn.close()
 
-# Helper to get DB connection
 def get_db_connection():
     conn = sqlite3.connect('condo_system.db')
-    conn.row_factory = sqlite3.Row # This allows accessing columns by name
+    conn.row_factory = sqlite3.Row
     return conn
 
-# --- USER AUTHENTICATION ---
-# Dummy users data for simplicity
+# --- HOME PAGE (Public Landing) ---
+@app.route('/home')
+def home_page():
+    conn = get_db_connection()
+    condos = conn.execute('SELECT * FROM condos').fetchall()
+    conn.close()
+    return render_template('home.html', condos=condos)
+
+# --- LOGIN SYSTEM ---
 users = {"admin": "admin123"}
 
 @app.route('/')
@@ -68,7 +74,7 @@ def login():
     password = request.form['password']
     if username in users and users[username] == password:
         session['username'] = username
-        return redirect(url_for('home'))
+        return redirect(url_for('dashboard'))
     else:
         return render_template('login.html', error="Invalid username or password")
 
@@ -77,12 +83,11 @@ def logout():
     session.pop('username', None)
     return redirect(url_for('login_page'))
 
-# --- MAIN DASHBOARD ---
+# --- DASHBOARD ---
 @app.route('/main')
-def home():
+def dashboard():
     if 'username' not in session:
         return redirect(url_for('login_page'))
-    
     conn = get_db_connection()
     condos = conn.execute('SELECT * FROM condos').fetchall()
     conn.close()
@@ -93,18 +98,19 @@ def home():
 def add_condo():
     if 'username' not in session:
         return redirect(url_for('login_page'))
-    
+
     name = request.form['name']
     location = request.form['location']
     price = request.form['price']
-    image_url = None
+
+    image_url = None  # default if no image uploaded
 
     if 'image' in request.files:
         file = request.files['image']
         if file.filename != '':
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            image_url = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            image_url = f"uploads/{filename}"  # store relative path for HTML
 
     conn = get_db_connection()
     conn.execute(
@@ -113,7 +119,7 @@ def add_condo():
     )
     conn.commit()
     conn.close()
-    return redirect(url_for('home'))
+    return redirect(url_for('dashboard'))
 
 # --- DELETE CONDO ---
 @app.route('/delete_condo/<int:condo_id>')
@@ -124,7 +130,7 @@ def delete_condo(condo_id):
     conn.execute('DELETE FROM condos WHERE id = ?', (condo_id,))
     conn.commit()
     conn.close()
-    return redirect(url_for('home'))
+    return redirect(url_for('dashboard'))
 
 # --- EDIT CONDO ---
 @app.route('/edit_condo/<int:condo_id>')
@@ -140,36 +146,48 @@ def edit_condo(condo_id):
 
 @app.route('/update_condo/<int:condo_id>', methods=['POST'])
 def update_condo(condo_id):
-    if 'username' not in session:
-        return redirect(url_for('login_page'))
-    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
     name = request.form['name']
     location = request.form['location']
     price = request.form['price']
     status = request.form['status']
 
-    conn = get_db_connection()
-    conn.execute(
-        'UPDATE condos SET name = ?, location = ?, price = ?, status = ? WHERE id = ?',
-        (name, location, price, status, condo_id)
-    )
+    image = request.files.get('image')
+    if image and image.filename != '':
+        filename = secure_filename(image.filename)
+        UPLOAD_FOLDER = os.path.join('static', 'uploads')
+        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+        app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+        image_url = f"uploads/{filename}"  # relative to 'static' folder
+
+        cursor.execute("""
+            UPDATE condos SET name=?, location=?, price=?, status=?, image_url=? WHERE id=?
+        """, (name, location, price, status, image_url, condo_id))
+    else:
+        cursor.execute("""
+            UPDATE condos SET name=?, location=?, price=?, status=? WHERE id=?
+        """, (name, location, price, status, condo_id))
+
     conn.commit()
     conn.close()
-    return redirect(url_for('home'))
+    return redirect(url_for('dashboard'))
 
-# --- BOOKING (kept simple for now) ---
+
+
+# --- BOOK CONDO ---
 @app.route('/book_condo/<int:condo_id>')
 def book_condo_page(condo_id):
-    # In a real app, you'd have a form here. We'll just update status.
     if 'username' not in session:
         return redirect(url_for('login_page'))
     conn = get_db_connection()
     conn.execute('UPDATE condos SET status = ? WHERE id = ?', ('Booked', condo_id))
     conn.commit()
     conn.close()
-    return redirect(url_for('home'))
-
+    return redirect(url_for('dashboard'))
 
 if __name__ == '__main__':
-    init_db() # Initialize the database when the app starts
+    init_db()
     app.run(debug=True)

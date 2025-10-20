@@ -279,3 +279,77 @@ header h1 {
     margin-top: 20px;
     color: #555;
 }
+/* ====== HOME PAGE ====== */
+.home-bg {
+    background: #f5f7fa;
+}
+
+.home-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    background: linear-gradient(90deg, #005bea, #00c6fb);
+    color: white;
+}
+
+.btn-login {
+    background: white;
+    color: #005bea;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: 0.3s;
+}
+.btn-login:hover {
+    background: #eaf3ff;
+}
+
+.hero {
+    text-align: center;
+    padding: 100px 20px;
+    background: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=80') center/cover;
+    color: white;
+}
+.hero h2 {
+    font-size: 3rem;
+    margin-bottom: 10px;
+}
+.hero p {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+.btn-primary {
+    background: linear-gradient(90deg, #005bea, #00c6fb);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: 0.3s;
+}
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+.featured-condos {
+    padding: 60px 40px;
+    text-align: center;
+}
+.featured-condos h2 {
+    color: #005bea;
+    margin-bottom: 30px;
+}
+.no-condos {
+    color: #888;
+    margin-top: 20px;
+}
+
+footer {
+    text-align: center;
+    background: #f0f0f0;
+    padding: 20px;
+    color: #555;
+    margin-top: 50px;
+}
