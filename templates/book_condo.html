@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Book Condo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="edit-container">
+        <h1>Book Condo: {{ condo.name }}</h1>
+        <form action="{{ url_for('book_condo', condo_id=condo.id) }}" method="POST">
+            <input type="text" name="renter_name" placeholder="Your Name" required>
+            <button type="submit">Confirm Booking</button>
+        </form>
+        <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Bookings</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>🏢 My Bookings</h1>
+        <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+    </header>
+    <div class="container">
+        <h2>Booked Condos</h2>
+        <ul>
+            {% for booking in bookings %}
+            <li>{{ booking.name }} - Booked by {{ booking.renter_name }}</li>
+            {% else %}
+            <p>No bookings yet.</p>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>

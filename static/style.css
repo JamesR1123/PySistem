@@ -3,353 +3,511 @@
 
 body {
     font-family: 'Poppins', sans-serif;
-    background: #f0f4f8;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); /* Subtle gradient for vibrancy */
     margin: 0;
     color: #333;
+    line-height: 1.6;
+    transition: background 0.3s ease; /* Smooth transitions */
 }
 
-/* ====== LOGIN PAGE (YOUR REQUEST) ====== */
+body.dark-mode {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    color: #ecf0f1;
+}
+
+/* Dark mode toggle */
+#dark-mode-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #00BFA5;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(0, 191, 165, 0.3);
+    transition: all 0.3s ease;
+}
+
+#dark-mode-toggle:hover {
+    background: #009688;
+    transform: scale(1.1);
+}
+
+/* ====== LOGIN PAGE ====== */
 .login-bg {
-    background: url('https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
-    background-size: cover;
+    background: url('https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80') center/cover no-repeat;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
+    position: relative;
+}
+
+.login-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(0, 191, 165, 0.6), rgba(255, 87, 34, 0.4)); /* Colorful overlay */
 }
 
 .login-container {
-    background: rgba(255, 255, 255, 0.9);
-    padding: 40px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 48px;
     border-radius: 16px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     text-align: center;
-    width: 350px;
+    width: 400px;
+    position: relative;
+    z-index: 1;
     backdrop-filter: blur(10px);
 }
 
 .login-container h1 {
-    color: #005bea;
-    margin-bottom: 20px;
+    color: #333;
+    margin-bottom: 24px;
+    font-weight: 600;
 }
 
 .login-container .error {
-    color: #d10b0b;
-    background: #ffe4e4;
-    padding: 10px;
+    color: #FF5722;
+    background: #FFF3E0;
+    padding: 12px;
     border-radius: 8px;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
+    font-size: 14px;
 }
 
 .login-container input {
     width: 100%;
-    padding: 12px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
+    padding: 16px;
+    margin-bottom: 16px;
+    border: 2px solid #E0E0E0;
     border-radius: 8px;
-    box-sizing: border-box; /* Important for padding */
+    box-sizing: border-box;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.login-container input:focus {
+    border-color: #00BFA5;
+    box-shadow: 0 0 8px rgba(0, 191, 165, 0.3);
 }
 
 .login-container button {
     width: 100%;
-    padding: 12px;
+    padding: 16px;
     border: none;
     border-radius: 8px;
-    background: linear-gradient(90deg, #005bea, #00c6fb);
+    background: linear-gradient(135deg, #00BFA5, #009688);
     color: white;
-    font-size: 1rem;
+    font-size: 16px;
+    font-weight: 500;
     cursor: pointer;
-    transition: 0.3s;
+    transition: background 0.3s, transform 0.2s;
 }
 
 .login-container button:hover {
-    transform: scale(1.03);
+    background: linear-gradient(135deg, #009688, #00796B);
+    transform: translateY(-2px);
 }
 
 /* ====== HEADER ====== */
 header {
-    background: linear-gradient(90deg, #005bea, #00c6fb);
-    color: white;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    color: #333;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 40px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    padding: 20px 48px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-bottom: 2px solid #00BFA5;
 }
 
 header h1 {
     font-weight: 600;
-    letter-spacing: 0.5px;
+    font-size: 24px;
+    color: #00BFA5;
 }
 
 .logout {
-    background: rgba(255,255,255,0.15);
-    padding: 8px 18px;
-    border-radius: 8px;
+    background: linear-gradient(135deg, #FF5722, #E64A19);
+    padding: 10px 20px;
+    border-radius: 24px;
     color: white;
     text-decoration: none;
-    transition: 0.3s;
+    font-weight: 500;
+    transition: background 0.3s, transform 0.2s;
 }
+
 .logout:hover {
-    background: white;
-    color: #005bea;
+    background: linear-gradient(135deg, #E64A19, #BF360C);
+    transform: scale(1.05);
 }
 
 /* ====== MAIN CONTAINER ====== */
 .container {
     max-width: 1200px;
-    margin: 40px auto;
-    padding: 0 20px;
+    margin: 48px auto;
+    padding: 0 24px;
+}
+
+/* ====== SEARCH BAR ====== */
+.search-bar {
+    background: linear-gradient(135deg, #ffffff 0%, #f0f4f8 100%);
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    margin-bottom: 32px;
+    border: 1px solid #00BFA5;
+}
+
+.search-bar form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+}
+
+.search-bar input, .search-bar select {
+    padding: 12px;
+    border: 2px solid #E0E0E0;
+    border-radius: 8px;
+    flex: 1 1 200px;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.search-bar input:focus, .search-bar select:focus {
+    border-color: #00BFA5;
+    box-shadow: 0 0 8px rgba(0, 191, 165, 0.3);
+}
+
+.search-bar button {
+    background: linear-gradient(135deg, #00BFA5, #009688);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.search-bar button:hover {
+    background: linear-gradient(135deg, #009688, #00796B);
+    transform: translateY(-2px);
 }
 
 /* ====== ADD CONDO FORM ====== */
 .add-condo-form {
-    background: white;
-    padding: 25px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    padding: 32px;
     border-radius: 16px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-    margin-bottom: 40px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+    margin-bottom: 48px;
+    border: 2px solid #00BFA5;
 }
 
 .add-condo-form h2 {
     margin-top: 0;
-    margin-bottom: 20px;
-    color: #005bea;
+    margin-bottom: 24px;
+    color: #00BFA5;
+    font-weight: 600;
 }
 
 .add-condo-form form {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 16px;
     align-items: center;
 }
 
-.add-condo-form input[type="text"],
-.add-condo-form input[type="number"] {
-    padding: 12px;
-    border: 1px solid #ccc;
+.add-condo-form input[type="text"], .add-condo-form input[type="number"] {
+    padding: 16px;
+    border: 2px solid #E0E0E0;
     border-radius: 8px;
-    flex: 1 1 180px; /* Allow flexible growth */
+    flex: 1 1 200px;
     outline: none;
+    font-size: 16px;
+    transition: border-color 0.3s, box-shadow 0.3s;
 }
 
-/* Style for file upload */
-.add-condo-form input[type="file"] {
-    display: none; /* Hide the default input */
+.add-condo-form input[type="text"]:focus, .add-condo-form input[type="number"]:focus {
+    border-color: #00BFA5;
+    box-shadow: 0 0 8px rgba(0, 191, 165, 0.3);
 }
+
+.add-condo-form input[type="file"] {
+    display: none;
+}
+
 .file-upload-label {
-    padding: 12px 20px;
-    background: #e9ecef;
+    padding: 16px 24px;
+    background: linear-gradient(135deg, #00BFA5, #009688);
     border-radius: 8px;
     cursor: pointer;
     text-align: center;
-    transition: 0.3s;
+    transition: background 0.3s, transform 0.2s;
+    border: 1px solid #00BFA5;
+    flex: 1 1 200px;
+    color: white;
 }
+
 .file-upload-label:hover {
-    background: #dde2e6;
+    background: linear-gradient(135deg, #009688, #00796B);
+    transform: translateY(-2px);
 }
 
 .add-condo-form button {
-    background: linear-gradient(90deg, #005bea, #00c6fb);
+    background: linear-gradient(135deg, #FF5722, #E64A19);
     color: white;
     border: none;
-    padding: 12px 20px;
+    padding: 16px 32px;
     border-radius: 8px;
     cursor: pointer;
-    transition: 0.3s;
-    flex-grow: 1; /* Allow button to grow */
+    transition: background 0.3s, transform 0.2s;
+    font-weight: 500;
+    flex-grow: 1;
 }
+
 .add-condo-form button:hover {
-    transform: scale(1.05);
+    background: linear-gradient(135deg, #E64A19, #BF360C);
+    transform: translateY(-2px);
 }
 
 /* ====== CONDO GRID ====== */
 .condo-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 25px;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
 }
 
 .condo-card {
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     overflow: hidden;
-    transition: 0.4s;
-    display: flex;
-    flex-direction: column;
+    transition: box-shadow 0.3s, transform 0.3s, border 0.3s;
+    border: 2px solid transparent;
 }
+
 .condo-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+    transform: translateY(-8px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+    border-color: #00BFA5;
 }
 
 .condo-card img {
     width: 100%;
-    height: 200px;
+    height: 240px;
     object-fit: cover;
+    transition: transform 0.3s;
+}
+
+.condo-card:hover img {
+    transform: scale(1.05);
 }
 
 .condo-info {
     padding: 20px;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
+    position: relative;
 }
 
 .condo-info h3 {
-    margin: 0;
-    color: #005bea;
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    color: #333;
 }
+
 .condo-info p {
-    margin: 5px 0;
+    margin: 4px 0;
+    font-size: 14px;
+    color: #666;
 }
 
 .status {
     display: inline-block;
-    padding: 4px 10px;
-    border-radius: 8px;
-    font-size: 0.85rem;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
     font-weight: 500;
-    margin-top: auto; /* Push to the bottom */
-    align-self: flex-start;
+    position: absolute;
+    top: 10px;
+    right: 10px;
 }
+
 .status.available {
-    background: #e0ffe5;
-    color: #1e9d2b;
+    background: linear-gradient(135deg, #4CAF50, #388E3C);
+    color: white;
 }
+
 .status.booked {
-    background: #ffe4e4;
-    color: #d10b0b;
+    background: linear-gradient(135deg, #FF5722, #E64A19);
+    color: white;
 }
+
 .actions {
-    margin-top: 15px;
-    padding-top: 10px;
-    border-top: 1px solid #eee;
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid #E0E0E0;
 }
+
 .actions a {
     text-decoration: none;
-    margin-right: 15px;
-    color: #005bea;
+    margin-right: 16px;
+    color: #00BFA5;
     font-weight: 500;
-    transition: 0.3s;
+    transition: color 0.3s, transform 0.2s;
 }
+
 .actions a.book-now {
-    color: #1e9d2b;
+    color: #FF5722;
 }
+
 .actions a:hover {
-    opacity: 0.7;
+    color: #00796B;
+    transform: scale(1.1);
 }
 
-/* ====== EDIT PAGE ====== */
-.edit-container {
-    max-width: 500px;
-    margin: 50px auto;
-    padding: 30px;
-    background: white;
+/* ====== EDIT/BOOK PAGES ====== */
+.edit-container, .book-container {
+    max-width: 600px;
+    margin: 64px auto;
+    padding: 48px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
     border-radius: 16px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 2px solid #00BFA5;
 }
 
-.edit-container form {
+.edit-container h1, .book-container h1 {
+    margin-bottom: 24px;
+    color: #00BFA5;
+    font-weight: 600;
+}
+
+.edit-container form, .book-container form {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 16px;
 }
 
-.edit-container input, .edit-container select {
-    padding: 12px;
+.edit-container input, .edit-container select, .book-container input {
+    padding: 16px;
     border-radius: 8px;
-    border: 1px solid #ccc;
+    border: 2px solid #E0E0E0;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
 }
 
-.edit-container button {
-    padding: 12px;
+.edit-container input:focus, .edit-container select:focus, .book-container input:focus {
+    border-color: #00BFA5;
+    box-shadow: 0 0 8px rgba(0, 191, 165, 0.3);
+}
+
+.edit-container button, .book-container button {
+    padding: 16px;
     border: none;
     border-radius: 8px;
-    background: linear-gradient(90deg, #005bea, #00c6fb);
+    background: linear-gradient(135deg, #00BFA5, #009688);
     color: white;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background 0.3s, transform 0.2s;
 }
 
-.edit-container a {
+.edit-container button:hover, .book-container button:hover {
+    background: linear-gradient(135deg, #009688, #00796B);
+    transform: translateY(-2px);
+}
+
+.edit-container a, .book-container a {
     display: block;
     text-align: center;
-    margin-top: 20px;
-    color: #555;
+    margin-top: 24px;
+    color: #00BFA5;
+    text-decoration: none;
+    font-weight: 500;
 }
+
+.edit-container a:hover, .book-container a:hover {
+    color: #00796B;
+}
+
+/* ====== MY BOOKINGS PAGE ====== */
+.my-bookings {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    padding: 48px;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+    border: 2px solid #00BFA5;
+}
+
+.my-bookings h2 {
+    color: #00BFA5;
+    font-weight: 600;
+}
+
+.my-bookings ul {
+    list-style: none;
+    padding: 0;
+}
+
+.my-bookings li {
+    background: linear-gradient(135deg, #f0f4f8, #e1f5fe);
+    padding: 16px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    border-left: 4px solid #00BFA5;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.my-bookings li:hover {
+    background: linear-gradient(135deg, #e1f5fe, #b3e5fc);
+    transform: translateX(4px);
+}
+
 /* ====== HOME PAGE ====== */
 .home-bg {
-    background: #f5f7fa;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 }
 
 .home-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 40px;
-    background: linear-gradient(90deg, #005bea, #00c6fb);
-    color: white;
+    padding: 24px 48px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    color: #333;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .btn-login {
-    background: white;
-    color: #005bea;
-    padding: 10px 20px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 500;
-    transition: 0.3s;
-}
-.btn-login:hover {
-    background: #eaf3ff;
-}
+    background: linear-gradient(135deg, #00BFA5, #009
 
-.hero {
-    text-align: center;
-    padding: 100px 20px;
-    background: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=80') center/cover;
+
+
+    .add-button {
+    background: linear-gradient(135deg, #FF5722, #E64A19);
     color: white;
-}
-.hero h2 {
-    font-size: 3rem;
-    margin-bottom: 10px;
-}
-.hero p {
-    font-size: 1.2rem;
-    margin-bottom: 20px;
-}
-.btn-primary {
-    background: linear-gradient(90deg, #005bea, #00c6fb);
-    color: white;
-    padding: 12px 24px;
+    border: none;
+    padding: 16px 32px;
     border-radius: 8px;
-    text-decoration: none;
+    cursor: pointer;
+    font-size: 16px;
     font-weight: 500;
-    transition: 0.3s;
+    transition: background 0.3s, transform 0.2s;
+    margin-top: 16px;
 }
-.btn-primary:hover {
-    opacity: 0.9;
-}
-
-.featured-condos {
-    padding: 60px 40px;
-    text-align: center;
-}
-.featured-condos h2 {
-    color: #005bea;
-    margin-bottom: 30px;
-}
-.no-condos {
-    color: #888;
-    margin-top: 20px;
-}
-
-footer {
-    text-align: center;
-    background: #f0f0f0;
-    padding: 20px;
-    color: #555;
-    margin-top: 50px;
+.add-button:hover {
+    background: linear-gradient(135deg, #E64A19, #BF360C);
+    transform: translateY(-2px);
 }
