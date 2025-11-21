@@ -5,13 +5,12 @@ from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'mysecretkey')  # Use env var in production
+app.secret_key = os.environ.get('SECRET_KEY', 'mysecretkey')
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static', 'uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5MB limit for uploads
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024
 
-# Allowed file extensions for images
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 def allowed_file(filename):
@@ -47,7 +46,6 @@ def init_db():
             role TEXT DEFAULT 'admin'
         )
     ''')
-    # Insert default admin only if not exists
     cursor.execute("SELECT * FROM users WHERE username='admin'")
     if not cursor.fetchone():
         hashed_pw = generate_password_hash('admin123')
@@ -60,7 +58,6 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-# --- SEARCH CONDOS (AJAX Endpoint) ---
 @app.route('/search_condos')
 def search_condos():
     location = request.args.get('location', '').strip()
@@ -88,18 +85,15 @@ def search_condos():
     condos = conn.execute(query, params).fetchall()
     conn.close()
     
-    # Return JSON for AJAX
     condos_list = [dict(condo) for condo in condos]
     return jsonify(condos_list)
 
-# --- HOME PAGE (Public Landing, shows filtered available condos) ---
 @app.route('/')
 def home_page():
-    # Default to available condos, but allow filters
     location = request.args.get('location', '')
     min_price = request.args.get('min_price', '')
     max_price = request.args.get('max_price', '')
-    status = request.args.get('status', 'Available')  # Default to Available for public
+    status = request.args.get('status', 'Available')
     
     query = "SELECT * FROM condos WHERE status = 'Available'"
     params = []
@@ -119,6 +113,46 @@ def home_page():
     conn.close()
     return render_template('home.html', condos=condos, location=location, min_price=min_price, max_price=max_price, status=status)
 
+# --- REGISTRATION SYSTEM ---
+@app.route('/register')
+def register_page():
+    return render_template('register.html')
+
+@app.route('/register', methods=['POST'])
+def register():
+    username = request.form['username']
+    password = request.form['password']
+    confirm_password = request.form['confirm_password']
+    
+    if password != confirm_password:
+        flash("Passwords do not match", "error")
+        return render_template('register.html')
+    
+    if len(password) < 6:
+        flash("Password must be at least 6 characters long", "error")
+        return render_template('register.html')
+    
+    conn = get_db_connection()
+    existing_user = conn.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
+    
+    if existing_user:
+        conn.close()
+        flash("Username already exists. Please choose another.", "error")
+        return render_template('register.html')
+    
+    hashed_pw = generate_password_hash(password)
+    try:
+        conn.execute("INSERT INTO users (username, password, role) VALUES (?, ?, ?)", 
+                    (username, hashed_pw, 'user'))
+        conn.commit()
+        conn.close()
+        flash("Registration successful! Please login.", "success")
+        return redirect(url_for('login_page'))
+    except Exception as e:
+        conn.close()
+        flash("Registration failed. Please try again.", "error")
+        return render_template('register.html')
+
 # --- LOGIN SYSTEM ---
 @app.route('/login')
 def login_page():
@@ -133,6 +167,7 @@ def login():
     conn.close()
     if user and check_password_hash(user['password'], password):
         session['username'] = username
+        session['role'] = user['role']
         return redirect(url_for('dashboard'))
     flash("Invalid username or password", "error")
     return render_template('login.html')
@@ -140,6 +175,7 @@ def login():
 @app.route('/logout')
 def logout():
     session.pop('username', None)
+    session.pop('role', None)
     return redirect(url_for('home_page'))
 
 # --- DASHBOARD ---
@@ -147,13 +183,18 @@ def logout():
 def dashboard():
     if 'username' not in session:
         return redirect(url_for('login_page'))
-    # Similar to home, but for all condos
+    
+    user_role = session.get('role', 'user')
     location = request.args.get('location', '')
     min_price = request.args.get('min_price', '')
     max_price = request.args.get('max_price', '')
     status = request.args.get('status', '')
     
-    query = "SELECT * FROM condos WHERE 1=1"
+    if user_role == 'admin':
+        query = "SELECT * FROM condos WHERE 1=1"
+    else:
+        query = "SELECT * FROM condos WHERE status = 'Available'"
+    
     params = []
     
     if location:
@@ -165,14 +206,18 @@ def dashboard():
     if max_price:
         query += " AND price <= ?"
         params.append(float(max_price))
-    if status:
+    if status and user_role == 'admin':
         query += " AND status = ?"
         params.append(status)
     
     conn = get_db_connection()
     condos = conn.execute(query, params).fetchall()
     conn.close()
-    return render_template('index.html', condos=condos, username=session['username'], location=location, min_price=min_price, max_price=max_price, status=status)
+    
+    if user_role == 'admin':
+        return render_template('admin_dashboard.html', condos=condos, username=session['username'], location=location, min_price=min_price, max_price=max_price, status=status)
+    else:
+        return render_template('user_dashboard.html', condos=condos, username=session['username'], location=location, min_price=min_price, max_price=max_price)
 
 # --- ADD CONDO ---
 @app.route('/add_condo', methods=['POST'])
@@ -181,11 +226,14 @@ def add_condo():
         flash("You must be logged in to add condos.", "error")
         return redirect(url_for('login_page'))
     
+    if session.get('role') != 'admin':
+        flash("Only admins can add condos.", "error")
+        return redirect(url_for('dashboard'))
+    
     name = request.form.get('name')
     location = request.form.get('location')
     price_str = request.form.get('price')
     
-    # Validate required fields
     if not name or not location or not price_str:
         flash("All fields (name, location, price) are required.", "error")
         return redirect(url_for('dashboard'))
@@ -208,14 +256,13 @@ def add_condo():
                 file.save(file_path)
                 image_url = filename
             except Exception as e:
-                print(f"File save error: {e}")  # Debug in terminal
+                print(f"File save error: {e}")
                 flash("Error uploading image. Try again.", "error")
                 return redirect(url_for('dashboard'))
         elif file and not allowed_file(file.filename):
             flash("Invalid image file type. Use PNG, JPG, etc.", "error")
             return redirect(url_for('dashboard'))
     
-    # Insert into DB
     try:
         conn = get_db_connection()
         conn.execute(
@@ -226,7 +273,7 @@ def add_condo():
         conn.close()
         flash("Condo added successfully!", "success")
     except Exception as e:
-        print(f"Database error: {e}")  # Debug in terminal
+        print(f"Database error: {e}")
         flash("Error adding condo. Please try again.", "error")
     
     return redirect(url_for('dashboard'))
@@ -236,6 +283,11 @@ def add_condo():
 def delete_condo(condo_id):
     if 'username' not in session:
         return redirect(url_for('login_page'))
+    
+    if session.get('role') != 'admin':
+        flash("Only admins can delete condos.", "error")
+        return redirect(url_for('dashboard'))
+    
     conn = get_db_connection()
     condo = conn.execute('SELECT image_url FROM condos WHERE id = ?', (condo_id,)).fetchone()
     if condo and condo['image_url']:
@@ -253,6 +305,11 @@ def delete_condo(condo_id):
 def edit_condo(condo_id):
     if 'username' not in session:
         return redirect(url_for('login_page'))
+    
+    if session.get('role') != 'admin':
+        flash("Only admins can edit condos.", "error")
+        return redirect(url_for('dashboard'))
+    
     conn = get_db_connection()
     condo = conn.execute('SELECT * FROM condos WHERE id = ?', (condo_id,)).fetchone()
     conn.close()
@@ -265,6 +322,10 @@ def edit_condo(condo_id):
 def update_condo(condo_id):
     if 'username' not in session:
         return redirect(url_for('login_page'))
+    
+    if session.get('role') != 'admin':
+        flash("Only admins can update condos.", "error")
+        return redirect(url_for('dashboard'))
     
     name = request.form['name']
     location = request.form['location']
@@ -347,4 +408,4 @@ def my_bookings():
 
 if __name__ == '__main__':
     init_db()
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

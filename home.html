@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CondoRent | Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="home-bg">
+    <header class="home-header">
+        <h1><i class="fas fa-home"></i> CondoRent</h1>
+        <nav>
+            <a href="{{ url_for('login_page') }}" class="btn-login"><i class="fas fa-sign-in-alt"></i> Login</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h2>Find Your Perfect Condo</h2>
+        <p>Browse beautiful condominiums for rent — modern, affordable, and near you!</p>
+        <div class="search-bar">
+            <form id="search-form">
+                <input type="text" id="location" name="location" placeholder="Location (e.g., Manila)" value="{{ location }}">
+                <input type="number" id="min_price" name="min_price" placeholder="Min Price" value="{{ min_price }}">
+                <input type="number" id="max_price" name="max_price" placeholder="Max Price" value="{{ max_price }}">
+                <select id="status" name="status">
+                    <option value="Available" {% if status == 'Available' %}selected{% endif %}>Available</option>
+                    <option value="Booked" {% if status == 'Booked' %}selected{% endif %}>Booked</option>
+                </select>
+                <button type="submit"><i class="fas fa-search"></i> Search</button>
+                <button type="button" id="clear-filters"><i class="fas fa-times"></i> Clear</button>
+            </form>
+        </div>
+    </section>
+
+    <section id="featured" class="featured-condos">
+        <h2><i class="fas fa-star"></i> Featured Condos</h2>
+        <div id="condo-results" class="condo-grid">
+            {% for condo in condos %}
+            <div class="condo-card">
+                <img src="{{ url_for('static', filename='uploads/' + (condo.image_url or 'default_condo.jpg')) }}" alt="Condo Image">
+                <div class="condo-info">
+                    <h3>{{ condo.name }}</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> {{ condo.location }}</p>
+                    <p><i class="fas fa-dollar-sign"></i> ₱{{ condo.price }} / month</p>
+                    <span class="status {{ 'available' if condo.status == 'Available' else 'booked' }}">{{ condo.status }}</span>
+                </div>
+            </div>
+            {% else %}
+            <p class="no-condos">No condos available yet.</p>
+            {% endfor %}
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2025 CondoRent. All rights reserved. <a href="#"><i class="fab fa-facebook"></i></a> <a href="#"><i class="fab fa-twitter"></i></a></p>
+    </footer>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
